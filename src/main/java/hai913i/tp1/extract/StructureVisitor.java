@@ -1,0 +1,155 @@
+package hai913i.tp1.extract;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
+import hai913i.tp1.model.FieldFact;
+import hai913i.tp1.model.MethodFact;
+import hai913i.tp1.model.TypeFact;
+import hai913i.tp1.model.TypeKind;
+import hai913i.tp1.model.Visibility;
+import hai913i.tp1.parse.JdtParser;
+import hai913i.tp1.parse.JdtParser.ParsedFile;
+import hai913i.tp1.parse.ProjectSources;
+
+public class StructureVisitor extends ASTVisitor {
+
+    // Accumulateur partagé sur toute la durée de vie de ce visiteur :
+    // une seule instance visite tous les fichiers du projet (voir main()).
+    private final List<TypeFact> types = new ArrayList<>();
+
+    public List<TypeFact> types() {
+        return types;
+    }
+
+    @Override
+    public boolean visit(TypeDeclaration node) {
+        TypeKind kind = node.isInterface() ? TypeKind.INTERFACE : TypeKind.CLASS;
+        extractType(node, kind);
+        return false;
+    }
+
+    @Override
+    public boolean visit(EnumDeclaration node) {
+        extractType(node, TypeKind.ENUM);
+        return false;
+    }
+
+    private void extractType(AbstractTypeDeclaration node, TypeKind kind) {
+        ITypeBinding binding = node.resolveBinding();
+        String qualifiedName = binding.getQualifiedName();
+        String packageName = binding.getPackage().getName();
+
+        List<String> superclasses = new ArrayList<>();
+        ITypeBinding current = binding.getSuperclass();
+        while (current != null && !current.getQualifiedName().equals("java.lang.Object")) {
+            superclasses.add(current.getQualifiedName());
+            current = current.getSuperclass();
+        }
+
+        List<String> interfaces = new ArrayList<>();
+        for (ITypeBinding itf : binding.getInterfaces()) {
+            interfaces.add(itf.getQualifiedName());
+        }
+
+        List<FieldFact> fields = new ArrayList<>();
+        List<MethodFact> methods = new ArrayList<>();
+
+        for (Object o : node.bodyDeclarations()) {
+            if (o instanceof TypeDeclaration nestedType) {
+                nestedType.accept(this);
+            } else if (o instanceof EnumDeclaration nestedEnum) {
+                nestedEnum.accept(this);
+            } else if (o instanceof MethodDeclaration method) {
+                methods.add(toMethodFact(method));
+            } else if (o instanceof FieldDeclaration field) {
+                fields.addAll(toFieldFacts(field));
+            }
+        }
+
+        types.add(new TypeFact(qualifiedName, packageName, kind,
+                superclasses, interfaces, fields, methods));
+    }
+
+    private MethodFact toMethodFact(MethodDeclaration method) {
+        IMethodBinding mb = method.resolveBinding();
+        String name = method.getName().getIdentifier();
+        List<String> parameterTypes = Arrays.stream(mb.getParameterTypes())
+                .map(t -> t.getErasure().getQualifiedName()).toList();
+        String id = MethodIds.of(mb);
+        return new MethodFact(id, name, parameterTypes, method.isConstructor(),
+                0, List.of()); // bodyLoc et calls : B2 / A3
+    }
+
+    private List<FieldFact> toFieldFacts(FieldDeclaration field) {
+        Visibility visibility = visibilityOf(field.getModifiers());
+        String declaredType = field.getType().toString();
+
+        List<FieldFact> result = new ArrayList<>();
+        for (Object f : field.fragments()) {
+            VariableDeclarationFragment fragment = (VariableDeclarationFragment) f;
+            result.add(new FieldFact(fragment.getName().getIdentifier(), declaredType, visibility));
+        }
+        return result;
+    }
+
+    private Visibility visibilityOf(int modifiers) {
+        if (Modifier.isPublic(modifiers))
+            return Visibility.PUBLIC;
+        if (Modifier.isProtected(modifiers))
+            return Visibility.PROTECTED;
+        if (Modifier.isPrivate(modifiers))
+            return Visibility.PRIVATE;
+        return Visibility.PACKAGE;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Path projectDirectory = Path.of(args[0]);
+        ProjectSources sources = ProjectSources.of(projectDirectory);
+        List<ParsedFile> files = JdtParser.parse(sources, List.of());
+
+        // Une SEULE instance pour tout le projet : l'accumulateur "types"
+        // doit persister d'un fichier à l'autre.
+        StructureVisitor visitor = new StructureVisitor();
+        for (ParsedFile f : files) {
+            f.unit().accept(visitor);
+        }
+
+        for (TypeFact t : visitor.types()) {
+            System.out.println(t.qualifiedName() + " (" + t.kind() + ") - "
+                    + t.methods().size() + " méthodes, " + t.fields().size() + " attributs");
+        }
+        System.out.println("Total : " + visitor.types().size() + " types");
+        for (TypeFact t : visitor.types()) {
+            if (t.qualifiedName().equals("library.service.LoanException")) {
+                System.out.println("Superclasses de LoanException : " + t.superclasses());
+            }
+            if (t.qualifiedName().equals("library.model.Item")) {
+                System.out.println("Attributs de Item :");
+                for (FieldFact f : t.fields()) {
+                    System.out.println("  " + f.name() + " -> " + f.visibility());
+                }
+            }
+        }
+        for (TypeFact t : visitor.types()) {
+    if (t.qualifiedName().equals("library.service.Catalog")) {
+        t.methods().forEach(m -> System.out.println(m.id()));
+    }
+}
+    }
+}

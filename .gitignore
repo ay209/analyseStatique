@@ -1,0 +1,21 @@
+# Build Maven
+target/
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+bin/
+out/
+
+# Systeme
+.DS_Store
+Thumbs.db
+__MACOSX/
+
+# Sorties generees par l'analyseur
+*.dot.png
+*.log
