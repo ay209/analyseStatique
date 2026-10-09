@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HAI913I - TP1 : projet de validation.
+  Ce projet est le code a ANALYSER (entree de votre analyseur), pas l'analyseur lui-meme.
+  Il compile et s'execute seul, ce qui garantit qu'il est du Java valide :
+    mvn -q clean compile
+    mvn -q exec:java
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fr.umontpellier.hai913i</groupId>
+    <artifactId>validation-project</artifactId>
+    <version>2026.1</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <!-- Arborescence volontairement courte : les sources sont directement sous src/ -->
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <mainClass>library.app.LibraryApp</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

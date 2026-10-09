@@ -26,10 +26,16 @@ public record ProjectSources(Path projectDirectory, Path sourceRoot, List<Path> 
                 .orElse(project);
         try (Stream<Path> paths = Files.walk(root)) {
             List<Path> files = paths.filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().endsWith(".java"))
+                    .filter(ProjectSources::isJavaFile)
                     .sorted()
                     .collect(Collectors.toList());
             return new ProjectSources(project, root, files);
         }
+    }
+
+    /** getFileName() peut valoir null (chemin vide ou racine) : on le garde explicitement. */
+    private static boolean isJavaFile(Path p) {
+        Path name = p.getFileName();
+        return name != null && name.toString().endsWith(".java");
     }
 }

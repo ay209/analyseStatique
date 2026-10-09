@@ -1,0 +1,31 @@
+name: Mutation testing (PIT)
+
+# PIT est lent (il rejoue les tests pour chaque mutant) : on le lance a la demande et une fois par semaine.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  pit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: PIT
+        run: mvn -B -ntp -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage
+      - name: Rapport PIT
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-report
+          path: target/pit-reports
+          if-no-files-found: ignore

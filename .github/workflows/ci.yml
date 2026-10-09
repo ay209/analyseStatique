@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+# Une nouvelle poussee annule le run precedent de la meme branche.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # 1. Les tests, sur les trois JDK qui comptent (le sujet demande JDK 17+).
+  test:
+    name: Tests (JDK ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21, 25]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: mvn verify
+        run: mvn -B -ntp verify
+      - name: Rapports Surefire
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-jdk${{ matrix.java }}
+          path: target/surefire-reports
+          if-no-files-found: ignore
+
+  # 2. Qualite : couverture (JaCoCo), style (Checkstyle), bugs courants (SpotBugs). Un seul JDK suffit.
+  quality:
+    name: Qualite (JaCoCo, Checkstyle, SpotBugs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: mvn verify -Pcoverage,quality
+        run: mvn -B -ntp verify -Pcoverage,quality
+      - name: Resume de couverture
+        if: always()
+        run: |
+          if [ -f target/site/jacoco/jacoco.csv ]; then
+            # colonnes jacoco.csv : 4 INSTRUCTION_MISSED, 5 INSTRUCTION_COVERED, 6 BRANCH_MISSED, 7 BRANCH_COVERED, 8 LINE_MISSED, 9 LINE_COVERED
+            awk -F, 'NR>1 { lm+=$8; lc+=$9; bm+=$6; bc+=$7 }
+                     END { printf "### Couverture JaCoCo\n\n- lignes : %.1f %% (%d / %d)\n- branches : %.1f %% (%d / %d)\n", 100*lc/(lm+lc), lc, lm+lc, 100*bc/(bm+bc), bc, bm+bc }' \
+              target/site/jacoco/jacoco.csv >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Rapports de qualite
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            target/site/jacoco
+            target/checkstyle-result.xml
+            target/spotbugsXml.xml
+          if-no-files-found: ignore
+
+  # 3. Le livrable : le jar executable.
+  package:
+    name: Jar executable
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - run: mvn -B -ntp package -DskipTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hai913i-tp1-analyzer
+          path: target/hai913i-tp1-analyzer.jar
+
+  # 4. Le conteneur : on le construit et on l'execute sur le projet de validation.
+  docker:
+    name: Image Docker
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire l'image
+        run: docker build -t hai913i-analyzer .
+      - name: Lancer l'analyseur dans le conteneur
+        run: |
+          docker run --rm \
+            -v "$PWD/src/test/resources/validation:/project:ro" \
+            hai913i-analyzer /project
