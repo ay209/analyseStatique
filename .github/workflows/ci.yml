@@ -104,4 +104,4 @@ jobs:
         run: |
           docker run --rm \
             -v "$PWD/src/test/resources/validation:/project:ro" \
-            hai913i-analyzer /project
+            hai913i-analyzer /project metrics 5

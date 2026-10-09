@@ -60,12 +60,11 @@ public final class JdtParser {
         List<ParsedFile> parsed = new ArrayList<>();
         parser.createASTs(paths, encodings, new String[0],
                 new FileASTRequestor() {
-                @Override
-                public void acceptAST(String file, CompilationUnit ast) {
+                    @Override
+                    public void acceptAST(String file, CompilationUnit ast) {
                         parsed.add(new ParsedFile(Path.of(file), ast));
-                        }
+                    }
                 }, null);
-        
         return parsed;
     }
 }

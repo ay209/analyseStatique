@@ -17,6 +17,6 @@ RUN useradd --system --uid 10001 analyzer
 COPY --from=build /build/target/hai913i-tp1-analyzer.jar /app/analyzer.jar
 
 USER analyzer
-# Le projet a analyser est monte ici : docker run -v "/chemin/projet:/project:ro" image /project
+# Le projet a analyser est monte ici : docker run -v "/chemin/projet:/project:ro" image /project structure
 WORKDIR /project
 ENTRYPOINT ["java", "-jar", "/app/analyzer.jar"]
