@@ -213,7 +213,7 @@
                             <effort>Default</effort>
                             <threshold>Medium</threshold>
                             <failOnError>false</failOnError>
-                            <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+                            <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
                         </configuration>
                         <executions>
                             <execution>

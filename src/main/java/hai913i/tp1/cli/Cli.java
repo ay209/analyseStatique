@@ -109,7 +109,7 @@ public final class Cli {
         return d.file().startsWith(root) ? root.relativize(d.file()).toString() : d.file().toString();
     }
 
-    private void print(Command command, Analysis analysis) {
+        private void print(Command command, Analysis analysis) {
         switch (command.action()) {
             case STRUCTURE -> lines(Report.structure(analysis.facts()));
             case CALLS -> lines(Report.calls(analysis.facts()));
@@ -119,6 +119,7 @@ public final class Cli {
             case CALLERS -> neighbours(analysis, command, true);
             case CALLEES -> neighbours(analysis, command, false);
             case SPOON -> lines(Comparison.report(analysis.facts(), spoon(analysis)));
+            default -> throw new IllegalStateException("Action non geree : " + command.action());
         }
     }
 

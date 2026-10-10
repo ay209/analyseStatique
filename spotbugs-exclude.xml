@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Les records du modele copient leurs listes (List.copyOf / sorted().toList()) : elles sont immuables.
+       SpotBugs ne le sait pas et signale EI_EXPOSE_REP : faux positif. -->
+  <Match>
+    <Package name="hai913i.tp1.model"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- L'arbre JDT (CompilationUnit) est transporte tel quel, volontairement. -->
+  <Match>
+    <Class name="hai913i.tp1.parse.JdtParser$ParsedFile"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- Records de transport : listes construites une fois par l'analyse, jamais modifiees ensuite. -->
+  <Match>
+    <Or>
+      <Class name="hai913i.tp1.cli.Analysis"/>
+      <Class name="hai913i.tp1.compare.SpoonResult"/>
+      <Class name="hai913i.tp1.parse.ProjectSources"/>
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- Cli garde les flux recus : injection de dependances voulue (System.out en production, tampons dans les tests). -->
+  <Match>
+    <Class name="hai913i.tp1.cli.Cli"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- Les visiteurs exposent leur resultat une fois la visite terminee. -->
+  <Match>
+    <Or>
+      <Class name="hai913i.tp1.extract.CallVisitor"/>
+      <Class name="hai913i.tp1.extract.StructureVisitor"/>
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+</FindBugsFilter>
