@@ -3,9 +3,9 @@
 Analyseur statique de projets Java fonde sur Eclipse JDT Core 3.46.0 : extraction de la structure et des appels,
 13 metriques, graphe d'appel pondere.
 
-- **Binome** : *PRENOM NOM (n° etudiant, parcours)* et *PRENOM NOM (n° etudiant, parcours)*
-- **Depot Git** : *URL A COMPLETER*
-- **Video de demonstration** : *URL A COMPLETER (ou `video/demonstration.mp4`)*
+- **Binome** : *Ay GUNCAVDI 21811378 M2 GL*
+- **Depot Git** : *https://github.com/ay209/analyseStatique*
+- **Video de demonstration** : *`video/demonstration.mp4`*
 
 ## Projet
 
