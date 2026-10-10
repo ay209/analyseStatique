@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import hai913i.tp1.graph.CallGraph;
 import hai913i.tp1.parse.Diagnostic;
@@ -109,21 +111,50 @@ public final class Cli {
             case STRUCTURE -> lines(Report.structure(analysis.facts()));
             case CALLS -> lines(Report.calls(analysis.facts()));
             case METRICS -> lines(Report.metrics(analysis.facts(), command.threshold()));
-            case GRAPH -> lines(Report.graph(CallGraph.build(analysis.facts())));
-            case DOT -> out.print(CallGraph.build(analysis.facts()).toDot());
-            case CALLERS -> neighbours(analysis, command.method(), true);
-            case CALLEES -> neighbours(analysis, command.method(), false);
+            case GRAPH -> lines(Report.graph(CallGraph.build(analysis.facts(), command.cha())));
+            case DOT -> dot(command, analysis);
+            case CALLERS -> neighbours(analysis, command, true);
+            case CALLEES -> neighbours(analysis, command, false);
         }
     }
 
-    private void neighbours(Analysis analysis, String query, boolean callers) {
-        CallGraph graph = CallGraph.build(analysis.facts());
+    /** Le graphe en DOT, éventuellement restreint à un paquetage et/ou au voisinage d'une méthode. */
+    private void dot(Command command, Analysis analysis) {
+        CallGraph graph = CallGraph.build(analysis.facts(), command.cha());
+        if (command.focus() == null && command.packageFilter() == null) {
+            out.print(graph.toDot());
+            return;
+        }
+        Set<String> keep = new TreeSet<>(graph.nodes());
+        if (command.focus() != null) {
+            keep = new TreeSet<>();
+            for (String id : resolve(graph, command.focus())) {
+                keep.addAll(graph.neighbourhood(id));
+            }
+        }
+        if (command.packageFilter() != null) {
+            Set<String> inPackage = graph.inPackage(command.packageFilter());
+            if (inPackage.isEmpty()) {
+                err.println("Avertissement : aucune methode dans le paquetage '" + command.packageFilter() + "'.");
+            }
+            keep.retainAll(inPackage);
+        }
+        out.print(graph.toDot(keep));
+    }
+
+    private static List<String> resolve(CallGraph graph, String query) {
         List<String> ids = graph.find(query);
         if (ids.isEmpty()) {
             throw new CliException(ANALYSIS_IMPOSSIBLE, "Methode inconnue : " + query
                     + " (utiliser un identifiant complet ou Type#methode ; voir l'action 'structure').");
         }
-        lines(Report.neighbours(graph, ids, callers));
+        return ids;
+    }
+
+    private void neighbours(Analysis analysis, Command command, boolean callers) {
+        String query = command.method();
+        CallGraph graph = CallGraph.build(analysis.facts(), command.cha());
+        lines(Report.neighbours(graph, resolve(graph, query), callers));
     }
 
     private void lines(List<String> lines) {

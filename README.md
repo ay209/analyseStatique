@@ -1,7 +1,21 @@
 # HAI913I - TP1 - Analyse statique (Universite de Montpellier, 2026-2027)
 
 Analyseur statique de projets Java fonde sur Eclipse JDT Core 3.46.0 : extraction de la structure et des appels,
-13 metriques, graphe d'appel pondere. Binome : *(a completer)*.
+13 metriques, graphe d'appel pondere.
+
+- **Binome** : *PRENOM NOM (n° etudiant, parcours)* et *PRENOM NOM (n° etudiant, parcours)*
+- **Depot Git** : *URL A COMPLETER*
+- **Video de demonstration** : *URL A COMPLETER (ou `video/demonstration.mp4`)*
+
+## Projet
+
+- **Entree** : le dossier d'un projet Java (sources `.java` ; pas de JAR ni de Maven requis cote projet analyse).
+- **Sorties** : texte sur la sortie standard (structure, appels, metriques, graphe) ou Graphviz DOT.
+- **Approche** : Eclipse JDT Core (`ASTParser` avec bindings), deux visiteurs (structure, appels) qui produisent un
+  modele de faits immuable ; metriques et graphe sont calcules sur ce modele seul. Spoon (bonus C) : non realise.
+- **Dependances** : Eclipse JDT Core 3.46.0 (et ses dependances transitives, telechargees par Maven) ; JUnit 5 pour les tests.
+- **Limites connues** : voir la section « Difficultes et parties incompletes » du compte-rendu (types locaux et anonymes
+  non comptes, `new C()` n'est pas un appel, appels virtuels suivis au type statique).
 
 ## Environnement
 
@@ -11,7 +25,10 @@ Analyseur statique de projets Java fonde sur Eclipse JDT Core 3.46.0 : extractio
 | Maven | 3.9.6 ou plus recent |
 | Eclipse JDT Core | 3.46.0 (telecharge par Maven) |
 | JUnit | 5.14.4 |
-| IDE | aucun requis ; le projet se construit en ligne de commande |
+| IDE | aucun requis ; le projet se construit en ligne de commande. Utilise : *A COMPLETER (editeur et version)* |
+| Systeme | *A COMPLETER (ex. macOS 15, Ubuntu 24.04)* |
+
+Versions exactes utilisees : JDK `A COMPLETER` (`java -version`), Maven `A COMPLETER` (`mvn -v`).
 
 ## Construction (depuis une copie propre, sans IDE)
 
@@ -99,6 +116,20 @@ Integration continue : `.github/workflows/ci.yml` (tests JDK 17/21/25, qualite, 
 docker build -t hai913i-analyzer .
 docker run --rm -v "$PWD/src/test/resources/validation:/project:ro" hai913i-analyzer /project metrics 5
 ```
+
+## Depannage
+
+| Symptome | Cause probable | Remede |
+|---|---|---|
+| `Le dossier n'existe pas : ...` (code 1) | chemin faux | verifier le chemin ; le mettre entre guillemets s'il contient des espaces |
+| `Aucun fichier Java dans ...` (code 1) | le dossier ne contient pas de `.java` | pointer vers le dossier du projet (celui qui contient `src/`) |
+| `Le seuil X doit etre un entier positif ou nul` (code 2) | `X` absent, negatif ou non numerique | `metrics 5` |
+| `Avertissement : N erreur(s) de compilation...` | des fichiers ne compilent pas | l'analyse continue ; corriger ou ignorer les fichiers signales |
+| beaucoup d'appels `[non resolu]` | une bibliotheque du projet analyse n'est pas disponible | normal sans classpath : ces appels sont conserves et marques non resolus |
+| `Unsupported class file major version` / `release 17 not supported` | JDK trop ancien | utiliser un JDK 17 ou plus recent (`java -version`) |
+| `mvn` ne telecharge pas les dependances | pas d'acces reseau a Maven Central | relancer avec acces reseau ; `mvn -o` ne marche qu'apres un premier build |
+| des tests de validation echouent avec `0` fichier | le dossier `src/test/resources/validation` est vide ou absent | restaurer le projet de validation (il doit contenir `src/library/...`) |
+| avertissements `overlapping classes` pendant `package` | fusion des bibliotheques Eclipse dans le JAR | sans gravite ; utiliser `mvn clean verify` plutot que `verify` sans `clean` |
 
 ## Architecture
 

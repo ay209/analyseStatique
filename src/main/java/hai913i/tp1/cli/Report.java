@@ -127,6 +127,9 @@ public final class Report {
         l.add("  externes              : " + graph.externalCallSites());
         l.add("  non resolus           : " + graph.unresolvedCallSites());
         l.add("  internes sans noeud   : " + graph.danglingCallSites());
+        if (graph.chaEnabled()) {
+            l.add("Mode CHA : " + graph.chaCallSites() + " lien(s) ajoute(s) vers des redefinitions");
+        }
         l.add("Arcs :");
         for (Arc a : graph.arcs()) {
             l.add("  " + a.caller() + " -> " + a.callee() + weight(a));
