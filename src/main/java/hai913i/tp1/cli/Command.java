@@ -16,7 +16,7 @@ public record Command(String project, Action action, int threshold, String metho
     /** Ce que l'outil sait produire. */
     public enum Action {
         STRUCTURE("structure"), CALLS("calls"), METRICS("metrics"), GRAPH("graph"), DOT("dot"),
-        CALLERS("callers"), CALLEES("callees");
+        CALLERS("callers"), CALLEES("callees"), SPOON("spoon");
 
         private final String keyword;
 

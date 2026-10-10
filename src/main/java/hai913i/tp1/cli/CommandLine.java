@@ -11,10 +11,11 @@ import hai913i.tp1.cli.Command.Action;
  *   structure | calls | graph | dot         (pas d'argument)
  *   metrics X                               (X entier >= 0 : seuil de la question 11)
  *   callers METHODE | callees METHODE
+ *   spoon                                   (bonus C1) compare JDT et Spoon, sans argument
  * Options (n'importe où après l'action) :
  *   --cha                (graph, dot, callers, callees) ajoute les arcs vers les redéfinitions connues
  *   --package P          (dot) ne dessine que les méthodes des types du paquetage P
- *   --focus METHODE      (dot) ne dessine que METHODE, ses appelants et ses appeles
+ *   --focus METHODE      (dot) ne dessine que METHODE, ses appelants et ses appelés
  */
 public final class CommandLine {
 
@@ -31,13 +32,14 @@ public final class CommandLine {
               dot                 graphe d'appel au format Graphviz DOT
               callers METHODE     qui appelle METHODE
               callees METHODE     ce qu'appelle METHODE
+              spoon               (bonus C1) compare nos resultats JDT a ceux de Spoon 11.5.0
             METHODE : identifiant complet, ou Type#methode (ex. Item#checkOut).
 
             Options (bonus) :
               --cha               graph, dot, callers, callees : ajoute les arcs vers les redefinitions
                                   connues dans les sous-types (appels virtuels, approximation de CHA)
               --package P         dot : ne dessine que les methodes des types du paquetage P
-              --focus METHODE     dot : ne dessine que METHODE, ses appelants et ses appeles
+              --focus METHODE     dot : ne dessine que METHODE, ses appelants et ses appelés
 
             Resultats sur la sortie standard ; erreurs et avertissements sur la sortie d'erreur.
             Codes de sortie : 0 succes, 1 analyse impossible, 2 arguments invalides, 3 erreur interne.

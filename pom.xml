@@ -39,6 +39,19 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- A ajouter dans <dependencies> du pom.xml (bonus C1) -->
+        <dependency>
+            <groupId>fr.inria.gforge.spoon</groupId>
+            <artifactId>spoon-core</artifactId>
+            <version>11.5.0</version>
+        </dependency>
+        <!-- Sans journaliseur SLF4J, Spoon affiche un avertissement au demarrage (annexe 2, §2.1) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>2.0.18</version>
+        </dependency>
+
     </dependencies>
 
     <build>

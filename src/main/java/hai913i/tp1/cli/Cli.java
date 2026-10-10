@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import hai913i.tp1.compare.Comparison;
+import hai913i.tp1.compare.SpoonResult;
 import hai913i.tp1.graph.CallGraph;
 import hai913i.tp1.parse.Diagnostic;
+import hai913i.tp1.spoon.SpoonExtractor;
 
 /**
  * Orchestration de la ligne de commande : valider les arguments, analyser, afficher.
@@ -115,6 +118,16 @@ public final class Cli {
             case DOT -> dot(command, analysis);
             case CALLERS -> neighbours(analysis, command, true);
             case CALLEES -> neighbours(analysis, command, false);
+            case SPOON -> lines(Comparison.report(analysis.facts(), spoon(analysis)));
+        }
+    }
+
+    /** Bonus C1 : refait l'extraction avec Spoon. Un échec de Spoon est une analyse impossible, pas un plantage. */
+    private static SpoonResult spoon(Analysis analysis) {
+        try {
+            return SpoonExtractor.extract(analysis.sources().sourceRoot());
+        } catch (RuntimeException | LinkageError e) {
+            throw new CliException(ANALYSIS_IMPOSSIBLE, "Spoon n'a pas pu analyser le projet : " + e);
         }
     }
 
