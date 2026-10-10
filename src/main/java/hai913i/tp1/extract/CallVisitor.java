@@ -219,44 +219,4 @@ public class CallVisitor extends ASTVisitor {
         }
         return null;
     }
-
-    // ---------- vérification A3 ----------
-    /*
-    public static void main(String[] args) throws IOException {
-        Path projectDirectory = Path.of(args[0]);
-        ProjectSources sources = ProjectSources.of(projectDirectory);
-        List<ParsedFile> files = JdtParser.parse(sources, List.of());
-
-        CallVisitor visitor = new CallVisitor(); // une seule instance pour tout le projet
-        for (ParsedFile f : files) {
-            f.unit().accept(visitor);
-        }
-
-        int total = 0, internal = 0, external = 0, unresolved = 0;
-        for (List<CallFact> calls : visitor.callsByMethod().values()) {
-            for (CallFact c : calls) {
-                total++;
-                if (!c.resolved())
-                    unresolved++;
-                else if (c.internal())
-                    internal++;
-                else
-                    external++;
-            }
-        }
-        System.out.println("Appels : " + total + " (internes " + internal
-                + ", externes " + external + ", non résolus " + unresolved + ")");
-
-        for (Map.Entry<String, List<CallFact>> e : visitor.callsByMethod().entrySet()) {
-            String caller = e.getKey();
-            if (caller.contains("LoanService#borrow") || caller.contains("LibraryApp#main")
-                    || caller.contains("Book#describe") || caller.contains("Catalog#available")) {
-                System.out.println(caller);
-                for (CallFact c : e.getValue()) {
-                    System.out.println("  l." + c.sourceLine() + "  " + c.staticReceiverType()
-                            + "  ->  " + c.targetId().orElse("NON RÉSOLU"));
-                }
-            }
-        }
-    }*/
 }

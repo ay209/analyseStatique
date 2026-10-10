@@ -153,40 +153,4 @@ public class StructureVisitor extends ASTVisitor {
             return Visibility.PRIVATE;
         return Visibility.PACKAGE;
     }
-
-    /* 
-    public static void main(String[] args) throws IOException {
-        Path projectDirectory = Path.of(args[0]);
-        ProjectSources sources = ProjectSources.of(projectDirectory);
-        List<ParsedFile> files = JdtParser.parse(sources, List.of());
-
-        // Une SEULE instance pour tout le projet : l'accumulateur "types"
-        // doit persister d'un fichier à l'autre.
-        StructureVisitor visitor = new StructureVisitor();
-        for (ParsedFile f : files) {
-            f.unit().accept(visitor);
-        }
-
-        for (TypeFact t : visitor.types()) {
-            System.out.println(t.qualifiedName() + " (" + t.kind() + ") - "
-                    + t.methods().size() + " méthodes, " + t.fields().size() + " attributs");
-        }
-        System.out.println("Total : " + visitor.types().size() + " types");
-        for (TypeFact t : visitor.types()) {
-            if (t.qualifiedName().equals("library.service.LoanException")) {
-                System.out.println("Superclasses de LoanException : " + t.superclasses());
-            }
-            if (t.qualifiedName().equals("library.model.Item")) {
-                System.out.println("Attributs de Item :");
-                for (FieldFact f : t.fields()) {
-                    System.out.println("  " + f.name() + " -> " + f.visibility());
-                }
-            }
-        }
-        for (TypeFact t : visitor.types()) {
-            if (t.qualifiedName().equals("library.service.Catalog")) {
-                t.methods().forEach(m -> System.out.println(m.id()));
-            }
-        }
-    }*/
 }

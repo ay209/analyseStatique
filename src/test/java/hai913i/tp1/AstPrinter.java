@@ -30,25 +30,4 @@ public class AstPrinter extends ASTVisitor{
         public void postVisit(ASTNode node) {
                 depth--;
         }
-        public static void main(String[] args) throws IOException {
-            Path projectDirectory = Path.of(args[0]); // ex: ../resources/validation
-            ProjectSources sources = ProjectSources.of(projectDirectory);
-            List<ParsedFile> files = JdtParser.parse(sources, List.of());
-
-            for(ParsedFile f : files)
-            {
-                if(f.path().endsWith("Dvd.java"))
-                {
-                    f.unit().accept(new AstPrinter());
-                }
-                if(f.path().endsWith("Category.java"))
-                {
-                    f.unit().accept(new AstPrinter());
-                }
-            }
-       
-        }
     }
-    
-    
-
