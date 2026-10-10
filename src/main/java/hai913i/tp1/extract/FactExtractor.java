@@ -13,17 +13,21 @@ import hai913i.tp1.model.ProjectFacts;
 import hai913i.tp1.model.TypeFact;
 import hai913i.tp1.parse.JdtParser.ParsedFile;
 
-/** Seule classe qui enchaîne les extracteurs : la frontière avec JDT s'arrête ici. */
+/**
+ * Seule classe qui enchaîne les extracteurs : la frontière avec JDT s'arrête
+ * ici.
+ */
 public final class FactExtractor {
 
-    private FactExtractor() {}
+    private FactExtractor() {
+    }
 
     public static ProjectFacts extract(List<ParsedFile> files) throws IOException {
         StructureVisitor structure = new StructureVisitor();
         CallVisitor calls = new CallVisitor();
         for (ParsedFile f : files) {
             f.unit().accept(structure); // passe 1 : types, attributs, méthodes
-            f.unit().accept(calls);     // passe 2 : appels
+            f.unit().accept(calls); // passe 2 : appels
         }
         Map<String, List<CallFact>> callsByMethod = calls.callsByMethod();
 
@@ -48,10 +52,14 @@ public final class FactExtractor {
     }
 
     /**
-     * Nombre de lignes physiques, SANS décoder le fichier : readAllLines lève MalformedInputException sur un
-     * fichier qui n'est pas de l'UTF-8 valide (ex. ISO-8859-1), alors qu'on n'a besoin que des fins de ligne.
-     * Une ligne se termine par \n, \r ou \r\n ; une dernière ligne sans fin de ligne compte aussi.
-     * Les octets 0x0A et 0x0D n'apparaissent jamais à l'intérieur d'un caractère UTF-8 multi-octets.
+     * Nombre de lignes physiques, SANS décoder le fichier : readAllLines lève
+     * MalformedInputException sur un
+     * fichier qui n'est pas de l'UTF-8 valide (ex. ISO-8859-1), alors qu'on n'a
+     * besoin que des fins de ligne.
+     * Une ligne se termine par \n, \r ou \r\n ; une dernière ligne sans fin de
+     * ligne compte aussi.
+     * Les octets 0x0A et 0x0D n'apparaissent jamais à l'intérieur d'un caractère
+     * UTF-8 multi-octets.
      */
     static int countLines(Path file) throws IOException {
         byte[] b = Files.readAllBytes(file);

@@ -1,7 +1,6 @@
 package hai913i.tp1.extract;
 
-import java.io.IOException;
-import java.nio.file.Path;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +24,7 @@ import hai913i.tp1.model.MethodFact;
 import hai913i.tp1.model.TypeFact;
 import hai913i.tp1.model.TypeKind;
 import hai913i.tp1.model.Visibility;
-import hai913i.tp1.parse.JdtParser;
-import hai913i.tp1.parse.JdtParser.ParsedFile;
-import hai913i.tp1.parse.ProjectSources;
+
 
 public class StructureVisitor extends ASTVisitor {
 

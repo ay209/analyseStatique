@@ -1,7 +1,5 @@
 package hai913i.tp1.extract;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -24,9 +22,7 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 
 import hai913i.tp1.model.CallFact;
-import hai913i.tp1.parse.JdtParser;
-import hai913i.tp1.parse.JdtParser.ParsedFile;
-import hai913i.tp1.parse.ProjectSources;
+
 
 public class CallVisitor extends ASTVisitor {
 

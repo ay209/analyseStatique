@@ -20,7 +20,6 @@ import org.junit.jupiter.api.io.TempDir;
 import hai913i.tp1.SourceGenerator.Call;
 import hai913i.tp1.SourceGenerator.Generated;
 import hai913i.tp1.SourceGenerator.Type;
-import hai913i.tp1.model.CallFact;
 import hai913i.tp1.model.FieldFact;
 import hai913i.tp1.model.MethodFact;
 import hai913i.tp1.model.ProjectFacts;
