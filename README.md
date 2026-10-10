@@ -5,7 +5,7 @@ Analyseur statique de projets Java fonde sur Eclipse JDT Core 3.46.0 : extractio
 
 - **Binome** : *Ay GUNCAVDI*
 - **Depot Git** : *https://github.com/ay209/analyseStatique*
-- **Video de demonstration** : *`video/demonstration.mp4`*
+- **Video de demonstration** : *https://youtu.be/Lr1BsfbacAA*
 
 ## Projet
 
